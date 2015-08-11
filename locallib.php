@@ -1250,8 +1250,8 @@ function certificate_get_certificate_filename($certificate, $cm, $course) {
 }
 
 /**
- * 10/08/2015 - José Eduardo Chaves Costa
- * Recuperar a data da mesma forma que metodo "get_date" com um diferença. A data virá sem formatação.
+ * 10/08/2015 - JosÃ© Eduardo Chaves Costa
+ * Recuperar a data da mesma forma que metodo "get_date" com um diferenÃ§a. A data virÃ¡ sem formataÃ§Ã£o.
  * @param unknown $certificate
  * @param unknown $certrecord
  * @param unknown $course
@@ -1289,34 +1289,22 @@ function certificate_get_date_unformated($certificate, $certrecord, $course, $us
 }
 
 /**
- * 14/07/2015 - 10:50 - José Eduardo (Zeduardu)
- * Recupera os tópicos para forma a lista de módulos cursados pelo estudante e formar o conteúdo programático. Basea-se
- * nos flags "Atividades de Recuperação" e "Encerramento do Curso" para gerar o programa somente com o que foi cursado.
+ * 14/07/2015 - 10:50 - JosÃ© Eduardo (Zeduardu)
+ * Recupera os tÃ³picos para formar a lista de mÃ³dulos cursados pelo estudante e formar o conteÃºdo programÃ¡tico. Basea-se
+ * nos flags "Atividades de RecuperaÃ§Ã£o" e "Encerramento do Curso" para gerar o programa somente com o que foi cursado.
  *
  * @param unknown $courseid
  */
 function certificate_getConteudoProgramatico($courseid) {
 	global $DB;
 
-	$sql = "SELECT
-                cose.name
-             FROM
-                {course} cour
-                INNER JOIN {course_sections} cose ON cose.course = cour.id
-             WHERE
-                cose.name IS NOT NULL
-                AND cour.id = :courseid
-    			AND cose.section <> 0
-                AND cose.name NOT LIKE \"%Atividades de Recuperação%\"
-                AND cose.name NOT LIKE \"%Encerramento do Curso%\"
-             ORDER BY
-                cose.section";
+	$sql = "SELECT cose.name FROM {course} cour INNER JOIN {course_sections} cose ON cose.course = cour.id WHERE cose.name IS NOT NULL AND cour.id = :courseid AND cose.section <> 0 AND cose.name NOT LIKE \"%Atividades de RecuperaÃ§Ã£o%\" AND cose.name NOT LIKE \"%Encerramento do Curso%\" ORDER BY cose.section";
 	return  $DB->get_records_sql($sql, array('courseid' => $courseid));
 }
 
 /**
- * 14/07/2015 - José Eduardo (Zeduardu)
- * Cria retângulo onde ficará assinatura do chefe do setor e código de autenticação.
+ * 14/07/2015 - JosÃ© Eduardo (Zeduardu)
+ * Cria retÃ¢ngulo onde ficarÃ¡ a assinatura do chefe do setor e cÃ³digo de autenticaÃ§Ã£o.
  *
  * @param stdClass $pdf
  * @param stdClass $certificate
@@ -1325,12 +1313,12 @@ function certificate_criarRetanguloAutenticacao($pdf, $certificate) {
 	$color = array(0, 0, 0); // black
 	switch ($certificate->orientation) {
 		case 'L':
-			// criar linha de borda na cor especificada na variável $color
+			// criar linha de borda na cor especificada na variï¿½vel $color
 			$pdf->SetLineStyle(array('width' => 0.5, 'color' => $color));
 			$pdf->Rect(159, 142, 120, 50);
 			break;
 		case 'P':
-			// criar linha de borda na cor especificada na variável $color
+			// criar linha de borda na cor especificada na variï¿½vel $color
 			$pdf->SetLineStyle(array('width' => 1.0, 'color' => $color));
 			$pdf->Rect(16, 16, 178, 265);
 			break;
@@ -1338,8 +1326,8 @@ function certificate_criarRetanguloAutenticacao($pdf, $certificate) {
 }
 
 /**
- * 10/08/2015 - José Eduardo Chaves Costa
- * Imprime em um local uma imagem específica.
+ * 10/08/2015 - JosÃ© Eduardo Chaves Costa
+ * Imprime em um local uma imagem especÃ­fica.
  * 
  * @param unknown $pdf
  * @param unknown $path
@@ -1352,7 +1340,7 @@ function certificate_criarRetanguloAutenticacao($pdf, $certificate) {
 function certificate_imprimirImagemEspecifica($pdf, $path, $uploadpath, $x, $y, $w, $h) {
 	global $CFG;
 
-	// Exemplo:
+	//Exemplo:
 	//$path = "$CFG->dirroot/mod/certificate/pix/signatures/arquivo.png ou jpeg";
 	//$uploadpath = "$CFG->dataroot/mod/certificate/pix/signatures/arquivo.png ou jpeg";
 
