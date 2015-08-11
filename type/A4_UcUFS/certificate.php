@@ -87,9 +87,9 @@ certificate_print_image($pdf, $certificate, CERT_IMAGE_SIGNATURE, $sigx, $sigy, 
 // Adicionando o cabeÃ§alho do certificado
 $pdf->SetTextColor(0, 0, 0);
 certificate_print_text($pdf, $sealx + 30, $sealy + 3, 'L', 'Helvetica', 'B', 18, "UNIVERSIDADE FEDERAL DE SERGIPE");
-certificate_print_text($pdf, $sealx + 30, $sealy + 13, 'L', 'Helvetica', '', 18, "PRÓ-REITORIA DE GESTÃO DE PESSOAS");
+certificate_print_text($pdf, $sealx + 30, $sealy + 13, 'L', 'Helvetica', '', 18, "PRÃ“-REITORIA DE GESTÃƒO DE PESSOAS");
 certificate_print_text($pdf, $sealx + 30, $sealy + 23, 'L', 'Helvetica', '', 18, "DEPARTAMENTO DE DESENVOLVIMENTO DE RECURSOS HUMANOS");
-certificate_print_text($pdf, $sealx + 30, $sealy + 33, 'L', 'Helvetica', '', 18, "DIVISÃO DE DESENVOLVIMENTO DE PESSOAL");
+certificate_print_text($pdf, $sealx + 30, $sealy + 33, 'L', 'Helvetica', '', 18, "DIVISÃƒO DE DESENVOLVIMENTO DE PESSOAL");
 $pdf->SetTextColor(0, 0, 0);
 certificate_print_text($pdf, $x, 80, 'C', 'Times', '', 32, "CERTIFICADO");
 
@@ -104,12 +104,12 @@ if ($certificate->printhours) {
  else {
      $carga_horaria = 0;
 }
-$texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo concluiu com aprovaçãoo o Curso $course->fullname, promovido pela Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no período de $data_inicio a $data_final, com carga horária total de $carga_horaria horas.";
+$texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo concluiu com aprovaÃ§Ã£o o Curso $course->fullname, promovido pela DivisÃ£o de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no perÃ­odo de $data_inicio a $data_final, com carga horÃ¡ria total de $carga_horaria horas.";
 certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, $texto_certificacao, 258);
 
 // Local e data de impressÃ£o do certificado
 $data_impressao = strftime('%d de %B de %Y', certificate_get_date_unformated($certificate, $certrecord, $course));
-certificate_print_text($pdf, $x, $y + 115, 'R', 'Times', '', 15, "Cidade Universitária Prof. José Aloísio de campos, $data_impressao.", 268);
+certificate_print_text($pdf, $x, $y + 115, 'R', 'Times', '', 15, "Cidade UniversitÃ¡ria Prof. JosÃ© AloÃ­sio de Campos, $data_impressao.", 268);
 
 // ImpressÃ£o das assinaturas
 certificate_imprimirImagemEspecifica($pdf, "$CFG->dirroot/mod/certificate/pix/signatures/Ass_Solange.png", "$CFG->dataroot/mod/certificate/pix/signatures/Ass_Solange.png", $x+30, $y+132, '', '');
@@ -123,7 +123,7 @@ certificate_print_text($pdf, $x+110, $y+150, 'L', 'Times', '', 15, "Diretora do 
 certificate_imprimirImagemEspecifica($pdf, "$CFG->dirroot/mod/certificate/pix/signatures/Ass_Ednalva.png", "$CFG->dataroot/mod/certificate/pix/signatures/Ass_Ednalva.png", $x+194, $y+134, '', '');
 certificate_print_text($pdf, $x+180, $y+140, 'L', 'Times', '', 15, "_____________________________");
 certificate_print_text($pdf, $x+195, $y+145, 'L', 'Times', '', 15, "Ednalva Freire Caetano");
-certificate_print_text($pdf, $x+185, $y+150, 'L', 'Times', '', 15, "Pró-Reitora de Gestão de Pessoas");
+certificate_print_text($pdf, $x+185, $y+150, 'L', 'Times', '', 15, "PrÃ³-Reitora de GestÃ£o de Pessoas");
 
 //Adicionando pÃ¡gina do conteÃºdo programÃ¡tico e do cÃ³digo de autenticaÃ§Ã£o.
 $pdf->AddPage();
@@ -137,7 +137,7 @@ $pdf->SetAlpha(0.2);
 certificate_print_image($pdf, $certificate, CERT_IMAGE_WATERMARK, $wmarkx, $wmarky, $wmarkw, $wmarkh);
 // Configurando alpha para voltar ao normal e cabeÃ§alho do conteÃºdo programÃ¡tico
 $pdf->SetAlpha(1);
-certificate_print_text($pdf, $x, $y, 'C', 'Times', '', 30, "CONTEÚDO PROGRAMÁTICO");
+certificate_print_text($pdf, $x, $y, 'C', 'Times', '', 30, "CONTEÃšDO PROGRAMÃTICO");
 
 // Adicionando as unidades temÃ¡ticas
 $conteudoProgramatico = certificate_getConteudoProgramatico($course->id);
@@ -154,10 +154,10 @@ $codigoAutenticacao = certificate_get_code($certificate, $certrecord);
 $dataImpressaoVerso = date('d/m/Y \aÂ \s G\:i', certificate_get_date_unformated($certificate, $certrecord, $course));
 certificate_criarRetanguloAutenticacao($pdf, $certificate);
 certificate_print_text($pdf, 152, 144, 'C', 'Helvetica', '', 10, "UNIVERSIDADE FEDERAL DE SERGIPE");
-certificate_print_text($pdf, 152, 148, 'C', 'Helvetica', '', 10, "PRÓ-REITORIA DE GESTÃO DE PESSOAS");
+certificate_print_text($pdf, 152, 148, 'C', 'Helvetica', '', 10, "PRÃ“-REITORIA DE GESTÃƒO DE PESSOAS");
 certificate_print_text($pdf, 152, 152, 'C', 'Helvetica', '', 9, "DEPARTAMENTO DE DESENVOLVIMENTO DE RECURSOS HUMANOS");
-certificate_print_text($pdf, 152, 156, 'C', 'Helvetica', '', 9, "DIVISÃO DE DESENVOLVIMENTO DE PESSOAL");
-certificate_print_text($pdf, 161, 162, 'J', 'Helvetica', '', 9, "O certificado de $nome_completo foi registrado no ambiente virtual de aprendizagem da Universidade Corporativa da UFS - UcUFS sob o código $codigoAutenticacao em $dataImpressaoVerso horas.", 117);
+certificate_print_text($pdf, 152, 156, 'C', 'Helvetica', '', 9, "DIVISÃƒO DE DESENVOLVIMENTO DE PESSOAL");
+certificate_print_text($pdf, 161, 162, 'J', 'Helvetica', '', 9, "O certificado de $nome_completo foi registrado no ambiente virtual de aprendizagem da Universidade Corporativa da UFS - UcUFS sob o cÃ³digo $codigoAutenticacao em $dataImpressaoVerso horas.", 117);
 certificate_imprimirImagemEspecifica($pdf, "$CFG->dirroot/mod/certificate/pix/signatures/Rub_Solange.png", "$CFG->dataroot/mod/certificate/pix/signatures/Rub_Solange.png", 211, 176, '', '');
 certificate_print_text($pdf, 152, 185, 'C', 'Helvetica', '', 9, "________________________");
 certificate_print_text($pdf, 152, 188, 'C', 'Helvetica', '', 9, "Chefe da DIDEP");
