@@ -151,7 +151,7 @@ if (!empty($conteudoProgramatico)) {
 
 // Adicionando quadro com código de autenticação, dia e horário de autenticação.
 $codigoAutenticacao = certificate_get_code($certificate, $certrecord);
-$dataImpressaoVerso = date('d/m/Y \a \s G\:i', certificate_get_date_unformated($certificate, $certrecord, $course));
+$dataImpressaoVerso = date('d/m/Y\, \á\s G\:i', certificate_get_date_unformated($certificate, $certrecord, $course));
 certificate_criarRetanguloAutenticacao($pdf, $certificate);
 certificate_print_text($pdf, 152, 144, 'C', 'Helvetica', '', 10, "UNIVERSIDADE FEDERAL DE SERGIPE");
 certificate_print_text($pdf, 152, 148, 'C', 'Helvetica', '', 10, "PRÓ-REITORIA DE GESTÃO DE PESSOAS");
