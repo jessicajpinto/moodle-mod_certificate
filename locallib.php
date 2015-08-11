@@ -1248,3 +1248,121 @@ function certificate_get_certificate_filename($certificate, $cm, $course) {
 
     return $filename;
 }
+
+/**
+ * 10/08/2015 - José Eduardo Chaves Costa
+ * Recuperar a data da mesma forma que metodo "get_date" com um diferença. A data virá sem formatação.
+ * @param unknown $certificate
+ * @param unknown $certrecord
+ * @param unknown $course
+ * @param string $userid
+ * @return unknown
+ */
+function certificate_get_date_unformated($certificate, $certrecord, $course, $userid = null) {
+	global $DB, $USER;
+
+	if (empty($userid)) {
+		$userid = $USER->id;
+	}
+
+	// Set certificate date to current time, can be overwritten later
+	$date = $certrecord->timecreated;
+
+	if ($certificate->printdate == '2') {
+		// Get the enrolment end date
+		$sql = "SELECT MAX(c.timecompleted) as timecompleted
+                  FROM {course_completion_crit_compl} c
+                 WHERE c.userid = :userid
+                   AND c.course = :courseid";
+		if ($timecompleted = $DB->get_record_sql($sql, array('userid' => $userid, 'courseid' => $course->id))) {
+			if (!empty($timecompleted->timecompleted)) {
+				$date = $timecompleted->timecompleted;
+			}
+		}
+	} else if ($certificate->printdate > 2) {
+		if ($modinfo = certificate_get_mod_grade($course, $certificate->printdate, $userid)) {
+			$date = $modinfo->dategraded;
+		}
+	}
+
+	return $date;
+}
+
+/**
+ * 14/07/2015 - 10:50 - José Eduardo (Zeduardu)
+ * Recupera os tópicos para forma a lista de módulos cursados pelo estudante e formar o conteúdo programático. Basea-se
+ * nos flags "Atividades de Recuperação" e "Encerramento do Curso" para gerar o programa somente com o que foi cursado.
+ *
+ * @param unknown $courseid
+ */
+function certificate_getConteudoProgramatico($courseid) {
+	global $DB;
+
+	$sql = "SELECT
+                cose.name
+             FROM
+                {course} cour
+                INNER JOIN {course_sections} cose ON cose.course = cour.id
+             WHERE
+                cose.name IS NOT NULL
+                AND cour.id = :courseid
+    			AND cose.section <> 0
+                AND cose.name NOT LIKE \"%Atividades de Recuperação%\"
+                AND cose.name NOT LIKE \"%Encerramento do Curso%\"
+             ORDER BY
+                cose.section";
+	return  $DB->get_records_sql($sql, array('courseid' => $courseid));
+}
+
+/**
+ * 14/07/2015 - José Eduardo (Zeduardu)
+ * Cria retângulo onde ficará assinatura do chefe do setor e código de autenticação.
+ *
+ * @param stdClass $pdf
+ * @param stdClass $certificate
+ */
+function certificate_criarRetanguloAutenticacao($pdf, $certificate) {
+	$color = array(0, 0, 0); // black
+	switch ($certificate->orientation) {
+		case 'L':
+			// criar linha de borda na cor especificada na variável $color
+			$pdf->SetLineStyle(array('width' => 0.5, 'color' => $color));
+			$pdf->Rect(159, 142, 120, 50);
+			break;
+		case 'P':
+			// criar linha de borda na cor especificada na variável $color
+			$pdf->SetLineStyle(array('width' => 1.0, 'color' => $color));
+			$pdf->Rect(16, 16, 178, 265);
+			break;
+	}
+}
+
+/**
+ * 10/08/2015 - José Eduardo Chaves Costa
+ * Imprime em um local uma imagem específica.
+ * 
+ * @param unknown $pdf
+ * @param unknown $path
+ * @param unknown $uploadpath
+ * @param unknown $x
+ * @param unknown $y
+ * @param unknown $w
+ * @param unknown $h
+ */
+function certificate_imprimirImagemEspecifica($pdf, $path, $uploadpath, $x, $y, $w, $h) {
+	global $CFG;
+
+	// Exemplo:
+	//$path = "$CFG->dirroot/mod/certificate/pix/signatures/arquivo.png ou jpeg";
+	//$uploadpath = "$CFG->dataroot/mod/certificate/pix/signatures/arquivo.png ou jpeg";
+
+	// Has to be valid
+	if (!empty($path)) {
+		if (file_exists($path)) {
+			$pdf->Image($path, $x, $y, $w, $h);
+		}
+		if (file_exists($uploadpath)) {
+			$pdf->Image($uploadpath, $x, $y, $w, $h);
+		}
+	}
+}
