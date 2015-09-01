@@ -107,7 +107,7 @@ if ($certificate->printhours) {
 if ($certificate->customtext) {
     certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, sprintf($certificate->customtext, $nome_completo), 258);
 } else {
-    $texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo atuou como Tutor de Conteúdo do curso $course->fullname, promovido pela Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no período de $data_inicio a $data_final, com carga horária total de $carga_horaria horas.";
+    $texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo atuou como Tutor de Conteúdo no curso $course->fullname, promovido pela Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no período de $data_inicio a $data_final, com carga horária total de $carga_horaria horas.";
     certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, $texto_certificacao, 258);
 }
 
