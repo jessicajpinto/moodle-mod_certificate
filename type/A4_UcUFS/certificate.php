@@ -104,8 +104,13 @@ if ($certificate->printhours) {
  else {
      $carga_horaria = 0;
 }
+
+if ($certificate->customtext) {
+    certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, sprintf($certificate->customtext, $nome_completo), 258);
+} else {
 $texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo concluiu com aprovação o Curso $course->fullname, promovido pela Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no período de $data_inicio a $data_final, com carga horária total de $carga_horaria horas.";
 certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, $texto_certificacao, 258);
+}
 
 // Local e data de impressão do certificado
 $data_impressao = strftime('%d de %B de %Y', certificate_get_date_unformated($certificate, $certrecord, $course));
