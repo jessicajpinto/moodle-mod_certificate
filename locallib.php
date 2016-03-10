@@ -1298,7 +1298,7 @@ function certificate_get_date_unformated($certificate, $certrecord, $course, $us
 function certificate_getConteudoProgramatico($courseid) {
 	global $DB;
 
-	$sql = "SELECT cose.name FROM {course} cour INNER JOIN {course_sections} cose ON cose.course = cour.id WHERE cose.name IS NOT NULL AND cour.id = :courseid AND cose.section <> 0 AND cose.name NOT LIKE \"%Atividades de Recuperação%\" AND cose.name NOT LIKE \"%Encerramento do Curso%\" ORDER BY cose.section";
+	$sql = "SELECT cose.section, cose.name FROM {course} cour INNER JOIN {course_sections} cose ON cose.course = cour.id WHERE cose.name IS NOT NULL AND cour.id = :courseid AND cose.section <> 0 AND cose.name NOT LIKE \"%Atividades de Recuperação%\" AND cose.name NOT LIKE \"%Encerramento do Curso%\" ORDER BY cose.section";
 	return  $DB->get_records_sql($sql, array('courseid' => $courseid));
 }
 
@@ -1353,4 +1353,32 @@ function certificate_imprimirImagemEspecifica($pdf, $path, $uploadpath, $x, $y, 
 			$pdf->Image($uploadpath, $x, $y, $w, $h);
 		}
 	}
+}
+
+/**
+ * 24/02/2016 - 14:50 - José Eduardo (Zeduardu)
+ * Recuperar do relatório de notas o resultado final baseado no id do curso. Traz do
+ * banco de dados a presença, baseado no módulo "attendance", de cada unidade do curso 
+ * cursado pelo aluno. O método ainda utiliza a variavel "gradepass" que precisa ser 
+ * informada para que retorne somente as unidades em que o aluno teve uma presença 
+ * mínima de aprovação.
+ *
+ * @param unknown $courseid
+ * @param unknown $userid
+ * @param unknown $gradepass
+ */
+function certificate_getFinalGradesByAttendance($courseid, $userid, $gradepass) {
+	global $DB;
+
+        $sql = "SELECT "
+                . "* "
+             . "FROM {grade_items} grit "
+                . "INNER JOIN {grade_grades} grgr ON grgr.itemid = grit.id "
+             . "WHERE "
+                . "grit.courseid = :courseid "
+                . "AND grgr.userid = :userid "
+                . "AND grit.itemmodule = \"attendance\" "
+                . "AND grgr.finalgrade > :finalgrade";
+        
+	return  $DB->get_records_sql($sql, array('courseid' => $courseid, 'userid' => $userid, 'finalgrade' => $gradepass));
 }
