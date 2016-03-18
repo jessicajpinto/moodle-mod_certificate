@@ -107,7 +107,7 @@ if ($certificate->customtext)
 } 
 else 
 {
-    $texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo participou do evento $course->fullname, promovido pela "
+    $texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo participou do programa $course->fullname, promovido pela "
                         . "Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no ano de " . date(Y, $course->startdate) . ", "
                         . "com carga horária total de $cargaHoraria horas.";
     certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, $texto_certificacao, 258);
@@ -151,7 +151,7 @@ if (!empty($gradeItensByAttendance))
     foreach ($gradeItensByAttendance as $gradeIten)
     {
         $i++;
-        certificate_print_text($pdf, $sealx + 3 , ($y + 20) + ($i * 6), 'L', 'Times', '', 11, $unidadesTematicas[$gradeIten->sortorder - 1]->name, '');
+        certificate_print_text($pdf, $sealx + 3 , ($y + 20) + ($i * 6), 'L', 'Times', '', 11, "-- " . $unidadesTematicas[$gradeIten->sortorder - 1]->name, '');
     }
 } 
 else 
@@ -168,7 +168,7 @@ certificate_print_text($pdf, 152, 144, 'C', 'Helvetica', '', 10, "UNIVERSIDADE F
 certificate_print_text($pdf, 152, 148, 'C', 'Helvetica', '', 10, "PRÓ-REITORIA DE GESTÃO DE PESSOAS");
 certificate_print_text($pdf, 152, 152, 'C', 'Helvetica', '', 9, "DEPARTAMENTO DE DESENVOLVIMENTO DE RECURSOS HUMANOS");
 certificate_print_text($pdf, 152, 156, 'C', 'Helvetica', '', 9, "DIVISÃO DE DESENVOLVIMENTO DE PESSOAL");
-certificate_print_text($pdf, 161, 162, 'J', 'Helvetica', '', 9, "O certificado de $nome_completo foi registrado no ambiente virtual de aprendizagem da Universidade Corporativa da UFS - UcUFS sob o código $codigoAutenticacao, $dataImpressaoVerso.", 117);
+certificate_print_text($pdf, 161, 162, 'J', 'Helvetica', '', 9, "O certificado de $nome_completo foi registrado no Ambiente Virtual de Aprendizagem da Universidade Corporativa da UFS (UcUFS), sob o código $codigoAutenticacao, $dataImpressaoVerso.", 117);
 certificate_imprimirImagemEspecifica($pdf, "$CFG->dirroot/mod/certificate/pix/signatures/Rub_Solange.png", "$CFG->dataroot/mod/certificate/pix/signatures/Rub_Solange.png", 211, 176, '', '');
 certificate_print_text($pdf, 152, 185, 'C', 'Helvetica', '', 9, "________________________");
 certificate_print_text($pdf, 152, 188, 'C', 'Helvetica', '', 9, "Chefe da DIDEP");
