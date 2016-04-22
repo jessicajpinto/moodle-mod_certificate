@@ -98,7 +98,17 @@ $nome_completo = fullname($USER); //Recuperando nome completo do usuario
 $paramGradePass = $DB->get_record('course_completion_criteria', array('course'=>$course->id, 'criteriatype'=>COMPLETION_CRITERIA_TYPE_GRADE), '*', MUST_EXIST); // Recuperando nota mínica de aprovação cadastrada na configuração de conclusão do curso.
 $gradeItensByAttendance = certificate_getFinalGradesByAttendance($course->id, $USER->id, $paramGradePass->gradepass); //Recuperar do relatório de notas a frequencia de cada módulo referente ao evento.
 $unidadesTematicas = certificate_getConteudoProgramatico($course->id); // Recuperando as unidades temáticas através do código do curso.
-$cargaHoraria = ($certificate->printhours) ? $certificate->printhours * count($gradeItensByAttendance) : 0;
+$cargaHoraria = 0;
+$tituloverso = "ENCONTROS TEMÁTICOS"; 
+$eventooucurso = "programa";
+if ($certificate->printhours) {
+	$cargaHoraria = $certificate->printhours * count ( $gradeItensByAttendance );
+}
+elseif ($certificate->printgrade > 0) {
+	$cargaHoraria = certificate_get_grade($certificate, $course);
+	$eventooucurso = "curso";
+	$tituloverso = "CONTEÚDO PROGRAMÁTICO";
+}
 
 // Adicionando texto de certificação que informa nome completo, data de início e fim do curso e sua carga horaria
 if ($certificate->customtext) 
@@ -107,7 +117,7 @@ if ($certificate->customtext)
 } 
 else 
 {
-    $texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo participou do programa $course->fullname, promovido pela "
+    $texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo participou do $eventooucurso $course->fullname, promovido pela "
                         . "Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no ano de " . date(Y, $course->startdate) . ", "
                         . "com carga horária total de $cargaHoraria horas.";
     certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, $texto_certificacao, 258);
@@ -143,7 +153,7 @@ $pdf->SetAlpha(0.2);
 certificate_print_image($pdf, $certificate, CERT_IMAGE_WATERMARK, $wmarkx, $wmarky, $wmarkw, $wmarkh);
 // Configurando alpha para voltar ao normal e cabeçalho do conteúdo programático
 $pdf->SetAlpha(1);
-certificate_print_text($pdf, $x, $y, 'C', 'Times', '', 30, "ENCONTROS TEMÁTICOS");
+certificate_print_text($pdf, $x, $y, 'C', 'Times', '', 30, $tituloverso);
 
 // Adicionar as unidades temáticas
 if (!empty($gradeItensByAttendance)) 

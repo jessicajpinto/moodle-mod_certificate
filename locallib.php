@@ -793,6 +793,7 @@ function certificate_get_mod_grade($course, $moduleid, $userid) {
         $modinfo->points = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_REAL, $decimals = 2);
         $modinfo->percentage = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_PERCENTAGE, $decimals = 2);
         $modinfo->letter = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_LETTER, $decimals = 0);
+        $modinfo->hours = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_REAL, $decimals = 0);
 
         if ($grade) {
             $modinfo->dategraded = $item->grades[$userid]->dategraded;
@@ -910,8 +911,11 @@ function certificate_get_grade($certificate, $course, $userid = null, $valueonly
                 $coursegrade->points = grade_format_gradevalue($grade->finalgrade, $course_item, true, GRADE_DISPLAY_TYPE_REAL, $decimals = 2);
                 $coursegrade->percentage = grade_format_gradevalue($grade->finalgrade, $course_item, true, GRADE_DISPLAY_TYPE_PERCENTAGE, $decimals = 2);
                 $coursegrade->letter = grade_format_gradevalue($grade->finalgrade, $course_item, true, GRADE_DISPLAY_TYPE_LETTER, $decimals = 0);
+                $coursegrade->hours = grade_format_gradevalue($grade->finalgrade, $course_item, true, GRADE_DISPLAY_TYPE_REAL, $decimals = 0);
 
-                if ($certificate->gradefmt == 1) {
+                if ($certificate->gradefmt == 0) {
+                	$grade =  $coursegrade->hours;
+                } else if ($certificate->gradefmt == 1) {
                     $grade = $strprefix . $coursegrade->percentage;
                 } else if ($certificate->gradefmt == 2) {
                     $grade = $strprefix . $coursegrade->points;
@@ -928,7 +932,9 @@ function certificate_get_grade($certificate, $course, $userid = null, $valueonly
                 if (!$valueonly) {
                     $strprefix = $modinfo->name . ' ' . get_string('grade', 'certificate') . ': ';
                 }
-                if ($certificate->gradefmt == 1) {
+            	if ($certificate->gradefmt == 0) {
+            		$grade = $modinfo->hours;
+            	} else if ($certificate->gradefmt == 1) {
                     $grade = $strprefix . $modinfo->percentage;
                 } else if ($certificate->gradefmt == 2) {
                     $grade = $strprefix . $modinfo->points;
@@ -1378,7 +1384,7 @@ function certificate_getFinalGradesByAttendance($courseid, $userid, $gradepass) 
                 . "grit.courseid = :courseid "
                 . "AND grgr.userid = :userid "
                 . "AND grit.itemmodule = \"attendance\" "
-                . "AND grgr.finalgrade > :finalgrade";
+                . "AND grgr.finalgrade >= :finalgrade";
         
 	return  $DB->get_records_sql($sql, array('courseid' => $courseid, 'userid' => $userid, 'finalgrade' => $gradepass));
 }

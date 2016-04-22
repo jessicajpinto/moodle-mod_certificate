@@ -104,7 +104,7 @@ class mod_certificate_mod_form extends moodleform_mod {
         $mform->setDefault('printgrade', 0);
         $mform->addHelpButton('printgrade', 'printgrade', 'certificate');
 
-        $gradeformatoptions = array( 1 => get_string('gradepercent', 'certificate'), 2 => get_string('gradepoints', 'certificate'),
+        $gradeformatoptions = array(0 => get_string('no'), 1 => get_string('gradepercent', 'certificate'), 2 => get_string('gradepoints', 'certificate'),
             3 => get_string('gradeletter', 'certificate'));
         $mform->addElement('select', 'gradefmt', get_string('gradefmt', 'certificate'), $gradeformatoptions);
         $mform->setDefault('gradefmt', 0);
