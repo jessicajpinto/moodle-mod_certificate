@@ -156,13 +156,13 @@ if (!empty($conteudoProgramatico)) {
 
 // Adicionando quadro com código de autenticação, dia e horário de autenticação.
 $codigoAutenticacao = certificate_get_code($certificate, $certrecord);
-$dataImpressaoVerso = date('d/m/Y\, \á\s G\:i', certificate_get_date_unformated($certificate, $certrecord, $course));
+$dataImpressaoVerso = date('\e\m j/n/Y\, \à\s G\hi', certificate_get_date_unformated($certificate, $certrecord, $course));
 certificate_criarRetanguloAutenticacao($pdf, $certificate);
 certificate_print_text($pdf, 152, 144, 'C', 'Helvetica', '', 10, "UNIVERSIDADE FEDERAL DE SERGIPE");
 certificate_print_text($pdf, 152, 148, 'C', 'Helvetica', '', 10, "PRÓ-REITORIA DE GESTÃO DE PESSOAS");
 certificate_print_text($pdf, 152, 152, 'C', 'Helvetica', '', 9, "DEPARTAMENTO DE DESENVOLVIMENTO DE RECURSOS HUMANOS");
 certificate_print_text($pdf, 152, 156, 'C', 'Helvetica', '', 9, "DIVISÃO DE DESENVOLVIMENTO DE PESSOAL");
-certificate_print_text($pdf, 161, 162, 'J', 'Helvetica', '', 9, "O certificado de $nome_completo foi registrado no ambiente virtual de aprendizagem da Universidade Corporativa da UFS - UcUFS sob o código $codigoAutenticacao em $dataImpressaoVerso horas.", 117);
+certificate_print_text($pdf, 161, 162, 'J', 'Helvetica', '', 9, "O certificado de $nome_completo foi registrado no ambiente virtual de aprendizagem da Universidade Corporativa da UFS - UcUFS sob o código $codigoAutenticacao, $dataImpressaoVerso.", 117);
 certificate_imprimirImagemEspecifica($pdf, "$CFG->dirroot/mod/certificate/pix/signatures/Rub_Solange.png", "$CFG->dataroot/mod/certificate/pix/signatures/Rub_Solange.png", 211, 176, '', '');
 certificate_print_text($pdf, 152, 185, 'C', 'Helvetica', '', 9, "________________________");
 certificate_print_text($pdf, 152, 188, 'C', 'Helvetica', '', 9, "Chefe da DIDEP");
