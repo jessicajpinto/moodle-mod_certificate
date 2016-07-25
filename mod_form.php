@@ -126,6 +126,10 @@ class mod_certificate_mod_form extends moodleform_mod {
         $mform->addElement('textarea', 'customtext', get_string('customtext', 'certificate'), array('cols'=>'40', 'rows'=>'4', 'wrap'=>'virtual'));
         $mform->setType('customtext', PARAM_RAW);
         $mform->addHelpButton('customtext', 'customtext', 'certificate');
+        
+        $mform->addElement('select', 'printprogcontent', get_string('printprogcontent', 'certificate'), $ynoptions);
+        $mform->setDefault('printprogcontent', 0);
+        $mform->addHelpButton('printprogcontent', 'printprogcontent', 'certificate');
 
         // Design Options
         $mform->addElement('header', 'designoptions', get_string('designoptions', 'certificate'));

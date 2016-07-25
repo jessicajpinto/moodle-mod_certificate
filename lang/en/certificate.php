@@ -205,3 +205,7 @@ $string['viewcertificateviews'] = 'View {$a} issued certificates';
 $string['viewed'] = 'You received this certificate on:';
 $string['viewtranscript'] = 'View Certificates';
 $string['watermark'] = 'Watermark';
+
+// This part of the Certificate module for Moodle, was modified by me "José Eduardo Chaves Costa" - http://moodlenoob.eti.br/
+$string['printprogcontent'] = 'Print Programatic Content';
+$string['printprogcontent_help'] = 'You decide on the back of the page appears the programmatic content of the course. For this you must select the option in the check box.';

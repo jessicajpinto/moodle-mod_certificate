@@ -73,6 +73,22 @@ if ($certificate->orientation == 'L') {
     $brdrh = 297;
     $codey = 250;
 }
+// Recuperando data de início cadastrado nas configurações do curso 
+$coursestartdate = date('d/m/Y', $course->startdate);
+// Recuperar através do "id" do curso os critérios de conclusão (Course->Course Administration->Course Completion)
+$cocc = $DB->get_record('course_completion_criteria', array('course'=>$course->id, 'criteriatype'=>COMPLETION_CRITERIA_TYPE_DATE), '*', MUST_EXIST);
+$coursefinaldate = date('d/m/Y', $cocc->timeend); // Armazenar a data que o usuário deve "permanecer inscrito até..." ou data final do curso.
+// Armazenar a data de impressão do certificado
+$printdate = strftime('%d de %B de %Y', certificate_get_date_unformated($certificate, $certrecord, $course));
+// Armazenar a carga horária do curso
+$workload = ($certificate->printhours) ? $certificate->printhours : 0;
+// Armazenar as unidades temáticas
+$thematicunits = certificate_getConteudoProgramatico($course->id);
+// Armazenar a decisão do usuário com relação a impressão das unidades temáticas
+$printprogcontent = ($certificate->printprogcontent == 1) ? TRUE : FALSE;
+// --
+$printdateleafverse = date('\e\m j/n/Y\, \à\s G\hi', certificate_get_date_unformated($certificate, $certrecord, $course));
+//Defined variables
 
 // Add images and lines
 certificate_print_image($pdf, $certificate, CERT_IMAGE_BORDER, $brdrx, $brdry, $brdrw, $brdrh);
@@ -94,27 +110,18 @@ $pdf->SetTextColor(0, 0, 0);
 certificate_print_text($pdf, $x, 80, 'C', 'Times', '', 32, "CERTIFICADO");
 
 // Adicionando texto de certificação que informa nome completo, data de início e fim do curso e sua carga horaria
-$nome_completo = fullname($USER); //Recuperando nome completo do usuario
-$data_inicio = date('d/m/Y', $course->startdate); //Recuperando data de início cadastrado nas configurações do curso 
-$cocc = $DB->get_record('course_completion_criteria', array('course'=>$course->id, 'criteriatype'=>COMPLETION_CRITERIA_TYPE_DATE), '*', MUST_EXIST); // Recuperando 
-$data_final = date('d/m/Y', $cocc->timeend);
-if ($certificate->printhours) {
-   $carga_horaria = $certificate->printhours;
-}
- else {
-     $carga_horaria = 0;
-}
-
-if ($certificate->customtext) {
+if ($certificate->customtext)
+{
     certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, sprintf($certificate->customtext, $nome_completo), 258);
-} else {
-$texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo concluiu com aprovação o Curso $course->fullname, promovido pela Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no período de $data_inicio a $data_final, com carga horária total de $carga_horaria horas.";
-certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, $texto_certificacao, 258);
+}
+else
+{
+    $texto_certificacao = "Certificamos que o(a) Sr(a) " . fullname($USER) . " concluiu com aprovação o Curso $course->fullname, promovido pela Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no período de $coursestartdate a $coursefinaldate, com carga horária total de $workload horas.";
+    certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, $texto_certificacao, 258);
 }
 
-// Local e data de impressão do certificado
-$data_impressao = strftime('%d de %B de %Y', certificate_get_date_unformated($certificate, $certrecord, $course));
-certificate_print_text($pdf, $x, $y + 115, 'R', 'Times', '', 15, "Cidade Universitária Prof. José Aloísio de Campos, $data_impressao.", 268);
+// ----
+certificate_print_text($pdf, $x, $y + 115, 'R', 'Times', '', 15, "Cidade Universitária Prof. José Aloísio de Campos, $printdate.", 268);
 
 // Impressão das assinaturas
 certificate_imprimirImagemEspecifica($pdf, "$CFG->dirroot/mod/certificate/pix/signatures/Ass_Solange.png", "$CFG->dataroot/mod/certificate/pix/signatures/Ass_Solange.png", $x+30, $y+132, '', '');
@@ -140,29 +147,33 @@ certificate_draw_frame($pdf, $certificate);
 // Set alpha to semi-transparency e colocando marca d'agua.
 $pdf->SetAlpha(0.2);
 certificate_print_image($pdf, $certificate, CERT_IMAGE_WATERMARK, $wmarkx, $wmarky, $wmarkw, $wmarkh);
-// Configurando alpha para voltar ao normal e cabeçalho do conteúdo programático
+// Configurando alpha para voltar ao normal
 $pdf->SetAlpha(1);
-certificate_print_text($pdf, $x, $y, 'C', 'Times', '', 30, "CONTEÚDO PROGRAMÁTICO");
 
-// Adicionando as unidades temáticas
-$conteudoProgramatico = certificate_getConteudoProgramatico($course->id);
-if (!empty($conteudoProgramatico)) {
-	$i = 0;
-    foreach ($conteudoProgramatico as $conteudo) {
-        $i++;
-        certificate_print_text($pdf, $sealx + 3 , ($y + 20) + ($i * 6), 'L', 'Times', '', 11, $conteudo->name, '');
+// A partir da decisão do usuário as unidades temáticas serão impressas.
+if ($printprogcontent)
+{
+    // Imprimir o cabeçalho do verso do certificado (Título do verso)
+    certificate_print_text($pdf, $x, $y, 'C', 'Times', '', 30, "CONTEÚDO PROGRAMÁTICO");
+    // Imprimir as unidades temáticas    
+    if (!empty($thematicunits))
+    {
+        $i = 0;
+        foreach ($thematicunits as $unit)
+        {
+            $i++;
+            certificate_print_text($pdf, $sealx + 3, ($y + 20) + ($i * 6), 'L', 'Times', '', 11, $unit->name, '');
+        }
     }
 }
 
 // Adicionando quadro com código de autenticação, dia e horário de autenticação.
-$codigoAutenticacao = certificate_get_code($certificate, $certrecord);
-$dataImpressaoVerso = date('\e\m j/n/Y\, \à\s G\hi', certificate_get_date_unformated($certificate, $certrecord, $course));
 certificate_criarRetanguloAutenticacao($pdf, $certificate);
 certificate_print_text($pdf, 152, 144, 'C', 'Helvetica', '', 10, "UNIVERSIDADE FEDERAL DE SERGIPE");
 certificate_print_text($pdf, 152, 148, 'C', 'Helvetica', '', 10, "PRÓ-REITORIA DE GESTÃO DE PESSOAS");
 certificate_print_text($pdf, 152, 152, 'C', 'Helvetica', '', 9, "DEPARTAMENTO DE DESENVOLVIMENTO DE RECURSOS HUMANOS");
 certificate_print_text($pdf, 152, 156, 'C', 'Helvetica', '', 9, "DIVISÃO DE DESENVOLVIMENTO DE PESSOAL");
-certificate_print_text($pdf, 161, 162, 'J', 'Helvetica', '', 9, "O certificado de $nome_completo foi registrado no ambiente virtual de aprendizagem da Universidade Corporativa da UFS - UcUFS sob o código $codigoAutenticacao, $dataImpressaoVerso.", 117);
+certificate_print_text($pdf, 161, 162, 'J', 'Helvetica', '', 9, "O certificado de " . fullname($USER) . " foi registrado no ambiente virtual de aprendizagem da Universidade Corporativa da UFS - UcUFS sob o código " . certificate_get_code($certificate, $certrecord) . ", $printdateleafverse.", 117);
 certificate_imprimirImagemEspecifica($pdf, "$CFG->dirroot/mod/certificate/pix/signatures/Rub_Solange.png", "$CFG->dataroot/mod/certificate/pix/signatures/Rub_Solange.png", 211, 176, '', '');
 certificate_print_text($pdf, 152, 185, 'C', 'Helvetica', '', 9, "________________________");
 certificate_print_text($pdf, 152, 188, 'C', 'Helvetica', '', 9, "Chefe da DIDEP");

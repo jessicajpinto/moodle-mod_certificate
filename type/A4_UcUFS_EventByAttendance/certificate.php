@@ -73,6 +73,30 @@ if ($certificate->orientation == 'L') {
     $brdrh = 297;
     $codey = 250;
 }
+// Recuperar nome completo do usuario
+$nome_completo = fullname($USER);
+// Recuperar nota mínima de aprovação cadastrada na configuração de conclusão do curso.
+$paramGradePass = $DB->get_record('course_completion_criteria', array('course'=>$course->id, 'criteriatype'=>COMPLETION_CRITERIA_TYPE_GRADE), '*', MUST_EXIST);
+// Recuperar do relatório de notas a frequencia de cada módulo referente ao evento.
+$gradeItensByAttendance = certificate_getFinalGradesByAttendance($course->id, $USER->id, $paramGradePass->gradepass);
+// Recuperar as unidades temáticas através do código do curso.
+$unidadesTematicas = certificate_getConteudoProgramatico($course->id);
+$cargaHoraria = 0;
+$tituloverso = "ENCONTROS TEMÁTICOS"; 
+$eventooucurso = "programa";
+if ($certificate->printhours)
+{
+    $cargaHoraria = $certificate->printhours * count($gradeItensByAttendance);
+}
+elseif ($certificate->printgrade > 0)
+{
+    $cargaHoraria = certificate_get_grade($certificate, $course);
+    $eventooucurso = "curso";
+    $tituloverso = "CONTEÚDO PROGRAMÁTICO";
+}
+// Armazenar a decisão do usuário com relação a impressão das unidades temáticas
+$printprogcontent = ($certificate->printprogcontent == 1) ? TRUE : FALSE;
+// Defined variables
 
 // Add images and lines
 certificate_print_image($pdf, $certificate, CERT_IMAGE_BORDER, $brdrx, $brdry, $brdrw, $brdrh);
@@ -93,23 +117,6 @@ certificate_print_text($pdf, $sealx + 30, $sealy + 33, 'L', 'Helvetica', '', 18,
 $pdf->SetTextColor(0, 0, 0);
 certificate_print_text($pdf, $x, 80, 'C', 'Times', '', 32, "CERTIFICADO");
 
-/* Armazenando variáveis */
-$nome_completo = fullname($USER); //Recuperando nome completo do usuario
-$paramGradePass = $DB->get_record('course_completion_criteria', array('course'=>$course->id, 'criteriatype'=>COMPLETION_CRITERIA_TYPE_GRADE), '*', MUST_EXIST); // Recuperando nota mínica de aprovação cadastrada na configuração de conclusão do curso.
-$gradeItensByAttendance = certificate_getFinalGradesByAttendance($course->id, $USER->id, $paramGradePass->gradepass); //Recuperar do relatório de notas a frequencia de cada módulo referente ao evento.
-$unidadesTematicas = certificate_getConteudoProgramatico($course->id); // Recuperando as unidades temáticas através do código do curso.
-$cargaHoraria = 0;
-$tituloverso = "ENCONTROS TEMÁTICOS"; 
-$eventooucurso = "programa";
-if ($certificate->printhours) {
-	$cargaHoraria = $certificate->printhours * count ( $gradeItensByAttendance );
-}
-elseif ($certificate->printgrade > 0) {
-	$cargaHoraria = certificate_get_grade($certificate, $course);
-	$eventooucurso = "curso";
-	$tituloverso = "CONTEÚDO PROGRAMÁTICO";
-}
-
 // Adicionando texto de certificação que informa nome completo, data de início e fim do curso e sua carga horaria
 if ($certificate->customtext) 
 {
@@ -118,7 +125,7 @@ if ($certificate->customtext)
 else 
 {
     $texto_certificacao = "Certificamos que o(a) Sr(a) $nome_completo participou do $eventooucurso $course->fullname, promovido pela "
-                        . "Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no ano de " . date(Y, $course->startdate) . ", "
+                        . "Divisão de Desenvolvimento de Pessoal - DIDEP/DDRH/PROGEP, no ano de " . date('Y', $course->startdate) . ", "
                         . "com carga horária total de $cargaHoraria horas.";
     certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, $texto_certificacao, 258);
 }
@@ -151,23 +158,29 @@ certificate_draw_frame($pdf, $certificate);
 // Set alpha to semi-transparency e colocando marca d'agua.
 $pdf->SetAlpha(0.2);
 certificate_print_image($pdf, $certificate, CERT_IMAGE_WATERMARK, $wmarkx, $wmarky, $wmarkw, $wmarkh);
-// Configurando alpha para voltar ao normal e cabeçalho do conteúdo programático
+// Configurando alpha para voltar ao normal
 $pdf->SetAlpha(1);
-certificate_print_text($pdf, $x, $y, 'C', 'Times', '', 30, $tituloverso);
 
-// Adicionar as unidades temáticas
-if (!empty($gradeItensByAttendance)) 
+// A partir da decisão do usuário as unidades temáticas são impressas.
+if ($printprogcontent) 
 {
-    foreach ($gradeItensByAttendance as $gradeIten)
+    //Imprime o título do verso da página.
+    certificate_print_text($pdf, $x, $y, 'C', 'Times', '', 30, $tituloverso);
+    //Imprime as unidades temáticas
+    if (!empty($gradeItensByAttendance)) 
     {
-        $i++;
-        certificate_print_text($pdf, $sealx + 3 , ($y + 20) + ($i * 6), 'L', 'Times', '', 11, "-- " . $unidadesTematicas[$gradeIten->sortorder - 1]->name, '');
+        $i = 0;
+        foreach ($gradeItensByAttendance as $gradeIten) 
+        {
+            $i++;
+            certificate_print_text($pdf, $sealx + 3, ($y + 20) + ($i * 6), 'L', 'Times', '', 11, "-- " . $unidadesTematicas[$gradeIten->sortorder - 1]->name, '');
+        }
+    } 
+    else 
+    {
+        throw new Exception('Não foi possível encontrar conteúdo programático para impressão de certificado./n'
+        . 'Verifique se o aluno atingiu nota/presença suficiente em algum módulo (seção).');
     }
-} 
-else 
-{
-    throw new Exception('Não foi possível encontrar conteúdo programático para impressão de certificado./n'
-                      . 'Verifique se o aluno atingiu nota/presença suficiente em algum módulo (seção).');
 }
 
 // Adicionando quadro com código de autenticação, dia e horário de autenticação.

@@ -497,5 +497,20 @@ function xmldb_certificate_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014041802, 'certificate');
     }
 
+    if ($oldversion < 2016071800) {
+
+        // Define field printprogcontent to be added to certificate.
+        $table = new xmldb_table('certificate');
+        $field = new xmldb_field('printprogcontent', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'customtext');
+
+        // Conditionally launch add field printprogcontent.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Certificate savepoint reached.
+        upgrade_mod_savepoint(true, 2016071800, 'certificate');
+    }
+    
     return true;
 }
