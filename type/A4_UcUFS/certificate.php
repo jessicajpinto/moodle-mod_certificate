@@ -112,7 +112,7 @@ certificate_print_text($pdf, $x, 80, 'C', 'Times', '', 32, "CERTIFICADO");
 // Adicionando texto de certificação que informa nome completo, data de início e fim do curso e sua carga horaria
 if ($certificate->customtext)
 {
-    certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, sprintf($certificate->customtext, $nome_completo), 258);
+    certificate_print_text($pdf, $x + 10, $y + 80, 'J', 'Times', '', 15, sprintf($certificate->customtext, fullname($USER)), 258);
 }
 else
 {
